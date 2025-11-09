@@ -78,44 +78,34 @@ jobs:
 
   notify:
     name: Notify Grafana
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Windows, X64]
     needs: [deploy]
     if: always()
     steps:
       - name: Send SUCCESS annotation
         if: ${{ success() }}
+        shell: pwsh
         env:
-          GRAFANA_URL: ${{ secrets.GRAFANA_URL }}
+          GRAFANA_URL: ${{ secrets.GRAFANA_URL }}  
           GRAFANA_TOKEN: ${{ secrets.GRAFANA_TOKEN }}
         run: |
-          TS_MS=$(($(date +%s)*1000))
-          cat > body.json <<EOF
-          {
-            "time": $TS_MS,
-            "text": "Weather CI/CD: SUCCESS (#${{ github.run_number }})\nrepo: ${{ github.repository }}\nbranch: ${{ github.ref_name }}\ncommit: ${{ github.sha }}",
-            "tags": ["github-actions","success"]
-          }
-          EOF
-          curl -sS -X POST "$GRAFANA_URL/api/annotations" \
-            -H "Authorization: Bearer $GRAFANA_TOKEN" \
-            -H "Content-Type: application/json" \
-            --data @body.json
+          $ts = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+          $text = "Weather CI/CD: SUCCESS (#${{ github.run_number }})`nrepo: ${{ github.repository }}`nbranch: ${{ github.ref_name }}`ncommit: ${{ github.sha }}"
+          $body = @{ time=$ts; text=$text; tags=@("github-actions","success") } | ConvertTo-Json -Compress
+          Invoke-RestMethod -Method POST -Uri "$env:GRAFANA_URL/api/annotations" `
+            -Headers @{ Authorization = "Bearer $env:GRAFANA_TOKEN" } `
+            -ContentType "application/json" -Body $body
 
       - name: Send FAILURE annotation
         if: ${{ failure() }}
+        shell: pwsh
         env:
           GRAFANA_URL: ${{ secrets.GRAFANA_URL }}
           GRAFANA_TOKEN: ${{ secrets.GRAFANA_TOKEN }}
         run: |
-          TS_MS=$(($(date +%s)*1000))
-          cat > body.json <<EOF
-          {
-            "time": $TS_MS,
-            "text": "Weather CI/CD: FAILURE (#${{ github.run_number }})\nrepo: ${{ github.repository }}\nbranch: ${{ github.ref_name }}\ncommit: ${{ github.sha }}",
-            "tags": ["github-actions","failure"]
-          }
-          EOF
-          curl -sS -X POST "$GRAFANA_URL/api/annotations" \
-            -H "Authorization: Bearer $GRAFANA_TOKEN" \
-            -H "Content-Type: application/json" \
-            --data @body.json
+          $ts = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+          $text = "Weather CI/CD: FAILURE (#${{ github.run_number }})`nrepo: ${{ github.repository }}`nbranch: ${{ github.ref_name }}`ncommit: ${{ github.sha }}"
+          $body = @{ time=$ts; text=$text; tags=@("github-actions","failure") } | ConvertTo-Json -Compress
+          Invoke-RestMethod -Method POST -Uri "$env:GRAFANA_URL/api/annotations" `
+            -Headers @{ Authorization = "Bearer $env:GRAFANA_TOKEN" } `
+            -ContentType "application/json" -Body $body
