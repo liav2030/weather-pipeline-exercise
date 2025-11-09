@@ -42,3 +42,9 @@ services:
         condition: service_healthy
     volumes:
       - ./grafana/provisioning:/etc/grafana/provisioning
+
+  collector:
+    image: docker.io/<dockerhub-user>/weather-collector:${GITHUB_SHA}
+    env_file: .env
+    depends_on:
+      - rabbitmq
