@@ -1,0 +1,22 @@
+name: Runner Test
+
+on:
+  push:
+    branches: [ "**" ]
+  workflow_dispatch:
+
+jobs:
+  check-runner:
+    runs-on: [self-hosted, Windows, X64]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Print system info
+        run: |
+          echo "✅ Runner is working!"
+          echo "OS: $env:RUNNER_OS"
+          echo "Computer name: $env:COMPUTERNAME"
+          echo "Current directory: $PWD"
+          echo "Python version (if installed):"
+          python --version || echo "Python not found"
