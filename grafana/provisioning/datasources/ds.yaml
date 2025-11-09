@@ -1,0 +1,11 @@
+apiVersion: 1
+datasources:
+  - name: Elastic
+    uid: elastic
+    type: elasticsearch
+    access: proxy
+    url: http://elasticsearch:9200
+    jsonData:
+      esVersion: 8
+      timeField: "@timestamp"
+      index: "weather-*"
