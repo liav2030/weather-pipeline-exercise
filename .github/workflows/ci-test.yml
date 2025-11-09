@@ -8,15 +8,18 @@ on:
 jobs:
   check-runner:
     runs-on: [self-hosted, Windows, X64]
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
+        
       - name: Print system info
         run: |
           echo "✅ Runner is working!"
-          echo "OS: $env:RUNNER_OS"
-          echo "Computer name: $env:COMPUTERNAME"
+          echo "OS: $RUNNER_OS"
+          echo "Computer name: $COMPUTERNAME"
           echo "Current directory: $PWD"
           echo "Python version (if installed):"
           python --version || echo "Python not found"
