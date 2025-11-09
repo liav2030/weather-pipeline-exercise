@@ -5,11 +5,11 @@ import pika
 
 load_dotenv()
 
-OWM_KEY   = os.getenv("OWM_API_KEY")
-CITY      = os.getenv("CITY", "London")
-INTERVAL  = int(os.getenv("SAMPLE_INTERVAL_SEC", "3600"))
+OWM_KEY = os.getenv("OWM_API_KEY")
+CITY = os.getenv("CITY", "London")
+INTERVAL = int(os.getenv("SAMPLE_INTERVAL_SEC", "3600"))
 RABBIT_URL = os.getenv("RABBIT_URL", "amqp://guest:guest@localhost:5672/%2f")
-QUEUE      = os.getenv("QUEUE", "weather")
+QUEUE = os.getenv("QUEUE", "weather")
 
 def sample_weather(city: str) -> dict:
     if not OWM_KEY:

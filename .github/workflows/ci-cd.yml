@@ -76,3 +76,46 @@ jobs:
           docker ps
 
 
+  notify:
+    name: Notify Grafana
+    runs-on: ubuntu-latest
+    needs: [deploy]
+    if: always()
+    steps:
+      - name: Send SUCCESS annotation
+        if: ${{ success() }}
+        env:
+          GRAFANA_URL: ${{ secrets.GRAFANA_URL }}
+          GRAFANA_TOKEN: ${{ secrets.GRAFANA_TOKEN }}
+        run: |
+          TS_MS=$(($(date +%s)*1000))
+          cat > body.json <<EOF
+          {
+            "time": $TS_MS,
+            "text": "Weather CI/CD: SUCCESS (#${{ github.run_number }})\nrepo: ${{ github.repository }}\nbranch: ${{ github.ref_name }}\ncommit: ${{ github.sha }}",
+            "tags": ["github-actions","success"]
+          }
+          EOF
+          curl -sS -X POST "$GRAFANA_URL/api/annotations" \
+            -H "Authorization: Bearer $GRAFANA_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data @body.json
+
+      - name: Send FAILURE annotation
+        if: ${{ failure() }}
+        env:
+          GRAFANA_URL: ${{ secrets.GRAFANA_URL }}
+          GRAFANA_TOKEN: ${{ secrets.GRAFANA_TOKEN }}
+        run: |
+          TS_MS=$(($(date +%s)*1000))
+          cat > body.json <<EOF
+          {
+            "time": $TS_MS,
+            "text": "Weather CI/CD: FAILURE (#${{ github.run_number }})\nrepo: ${{ github.repository }}\nbranch: ${{ github.ref_name }}\ncommit: ${{ github.sha }}",
+            "tags": ["github-actions","failure"]
+          }
+          EOF
+          curl -sS -X POST "$GRAFANA_URL/api/annotations" \
+            -H "Authorization: Bearer $GRAFANA_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data @body.json
