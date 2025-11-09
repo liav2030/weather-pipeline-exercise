@@ -34,3 +34,5 @@
 
 חשבתי אם להרים את כל המערכת (Collector, Elastic, Logstash, Grafana, RabbitMQ) באותו Compose אחד
 או להפריד את ה־Collector לריצה עצמאית. בסוף החלטתי להשאיר הכל ב compose אחד כדי לשמור על עקביות.
+
+במהלך התרגיל עשיתי צילומי מסך של חלק מהדברים מעלה לתיקיית Screenshots.
