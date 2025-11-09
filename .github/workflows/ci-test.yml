@@ -35,14 +35,18 @@ jobs:
         run: pytest -q || echo "no tests yet"
 
   deploy:
-    runs-on: [self-hosted, Windows, X64]  
+    runs-on: [self-hosted, Windows, X64]
     needs: [build, test]
     steps:
       - uses: actions/checkout@v4
+
       - name: Compose up (detached)
-        shell: powershell
+        shell: pwsh
         run: |
           docker --version
           docker compose version
-          docker compose pull || $true
+          docker compose pull; if ($LASTEXITCODE -ne 0) { "pull failed (code $LASTEXITCODE), continuing"; $global:LASTEXITCODE = 0 }
           docker compose up -d --build
+
+
+
