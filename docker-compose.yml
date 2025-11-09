@@ -44,7 +44,7 @@ services:
       - ./grafana/provisioning:/etc/grafana/provisioning
 
   collector:
-    image: docker.io/<dockerhub-user>/weather-collector:${GITHUB_SHA}
+    image: docker.io/liav2020/weather-collector:${GITHUB_SHA}
     env_file: .env
     depends_on:
       - rabbitmq
